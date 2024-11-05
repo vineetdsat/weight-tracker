@@ -79,6 +79,12 @@ async function fetchData() {
 function renderChart(labels, weights) {
     const ctx = document.getElementById('chart').getContext('2d');
 
+    // Find the minimum and maximum weights and their indices
+    const minWeight = Math.min(...weights);
+    const maxWeight = Math.max(...weights);
+    const minIndex = weights.indexOf(minWeight);
+    const maxIndex = weights.indexOf(maxWeight);
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -90,19 +96,51 @@ function renderChart(labels, weights) {
                 backgroundColor: 'rgba(0, 255, 0, 0.1)',
                 borderWidth: 2,
                 pointRadius: 0, // Removes the dots at each data point
-                pointHoverRadius: 0 // Ensures no dots appear on hover
+                pointHoverRadius: 0, // Ensures no dots appear on hover
+                // Show data labels for min and max points only
+                datalabels: {
+                    display: function(context) {
+                        // Display only for min and max points
+                        return context.dataIndex === minIndex || context.dataIndex === maxIndex;
+                    },
+                    align: 'top',
+                    anchor: 'end',
+                    formatter: function(value) {
+                        return value.toFixed(2) + ' kg';
+                    },
+                    color: '#00ff00',
+                    font: {
+                        weight: 'bold'
+                    }
+                }
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toFixed(2) + ' kg';
+                        }
+                    }
+                },
+                datalabels: { // Enable the DataLabels plugin for the chart
+                    color: '#fff',
+                    font: {
+                        size: 12,
+                        weight: 'bold'
+                    }
+                }
             },
             scales: {
                 y: {
                     ticks: {
                         color: '#fff',
-                        callback: function(value) { return value + ' kg'; } // Adds kg unit to y-axis
+                        callback: function(value) {
+                            return value.toFixed(2) + ' kg'; // Display y-axis values in 2 decimal places with kg unit
+                        }
                     }
                 },
                 x: {
@@ -112,9 +150,11 @@ function renderChart(labels, weights) {
             layout: {
                 padding: { left: 20, right: 20 }
             }
-        }
+        },
+        plugins: [ChartDataLabels] // Ensure that the ChartDataLabels plugin is included
     });
 }
+
 
 // Function to update the page with chart and metrics
 async function updatePage() {
