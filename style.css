@@ -1,0 +1,84 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #121212;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+header {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stats div {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+    flex: 1 1 150px;
+    max-width: 180px;
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 1em;
+    text-align: center;
+}
+
+.stats span {
+    font-size: 1.2em;
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+}
+
+.chart-container {
+    width: 100%;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 20px;
+}
+
+canvas {
+    width: 100%; /* Ensures the chart fills the container */
+    max-height: 400px; /* Limit the height on smaller screens */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        font-size: 1.5em;
+    }
+
+    .stats div {
+        padding: 10px;
+        max-width: 100%; /* Expand metrics div to full width on smaller screens */
+    }
+
+    .chart-container {
+        padding: 5px;
+    }
+
+    canvas {
+        max-height: 300px; /* Reduce chart height further for small screens */
+    }
+}
