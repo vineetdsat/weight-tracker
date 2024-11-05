@@ -43,9 +43,7 @@ function calculateMetrics(data) {
     };
 }
 
-
-
-// Function to fetch data from server
+// Function to fetch data from Google Sheets
 async function fetchData() {
     const sheetId = '1xZoIrtg7Mb2XL-_s3eM8JptnTrg4Zc4N48KGhBG5k1g'; // Replace with your actual Google Sheet ID
     const apiKey = 'AIzaSyCqr7U6m8gIl8RAnAIPGXOC12uGMAxJ4ek'; // Replace with your actual Google Sheets API key
@@ -77,8 +75,46 @@ async function fetchData() {
     }
 }
 
+// Function to render the chart without data point dots and x-axis
+function renderChart(labels, weights) {
+    const ctx = document.getElementById('chart').getContext('2d');
 
-
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels, // Dates are included for tooltip context
+            datasets: [{
+                label: 'Weight',
+                data: weights,
+                borderColor: '#00ff00',
+                backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                borderWidth: 2,
+                pointRadius: 0, // Removes the dots at each data point
+                pointHoverRadius: 0 // Ensures no dots appear on hover
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        color: '#fff',
+                        callback: function(value) { return value + ' kg'; } // Adds kg unit to y-axis
+                    }
+                },
+                x: {
+                    display: false // Hides the x-axis with dates
+                }
+            },
+            layout: {
+                padding: { left: 20, right: 20 }
+            }
+        }
+    });
+}
 
 // Function to update the page with chart and metrics
 async function updatePage() {
@@ -91,40 +127,7 @@ async function updatePage() {
         const labels = data.map(entry => entry.date);
         const weights = data.map(entry => entry.weight);
 
-        const ctx = document.getElementById('chart').getContext('2d');
-        const weightChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Weight',
-                    data: weights,
-                    borderColor: '#00ff00',
-                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
-                    borderWidth: 2,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#00ff00'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: '#fff',
-                            callback: function(value) { return value + ' kg'; } // Adds kg unit to y-axis
-                        }
-                    },
-                    x: { ticks: { color: '#fff' } }
-                },
-                layout: {
-                    padding: { left: 20, right: 20 }
-                }
-            }
-        });
+        renderChart(labels, weights); // Call renderChart to render the updated chart
 
         // Calculate and render metrics
         const metrics = calculateMetrics(data);
@@ -143,44 +146,3 @@ async function updatePage() {
 
 // Initial call to update the page
 updatePage();
-
-function updateChart(data) {
-    const ctx = document.getElementById('chart').getContext('2d');
-    const weights = data.map(entry => entry.weight);
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(entry => entry.date), // Dates are included but will be hidden on the x-axis
-            datasets: [{
-                label: 'Weight',
-                data: weights,
-                borderColor: 'lime',
-                backgroundColor: 'lime',
-                fill: false,
-                tension: 0.1,
-                pointRadius: 0 // Removes the dots at each data point
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    display: false // Hides the x-axis with dates
-                },
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Weight (kg)'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false // Hides the legend if you don't want the "Weight" label
-                }
-            }
-        }
-    });
-}
