@@ -1,4 +1,51 @@
-// Function to fetch data from Google Sheets
+// Function to calculate metrics
+function calculateMetrics(data) {
+    // Ensure data has at least one entry
+    if (data.length === 0) return {};
+
+    const latestWeight = data[data.length - 1].weight;
+    const secondLatestWeight = data.length > 1 ? data[data.length - 2].weight : latestWeight;
+    const initialWeight = data[0].weight;
+
+    // Calculate 'Actual' - Latest weight entered
+    const actual = latestWeight;
+
+    // Calculate 'Change' - Difference between the latest weight and the second latest weight
+    const change = latestWeight - secondLatestWeight;
+
+    // Calculate 'Trend (week)' - Average weight change per week (from last 7 days)
+    const weeklyData = data.slice(-7);
+    const trendWeek = weeklyData.length > 1
+        ? (weeklyData[weeklyData.length - 1].weight - weeklyData[0].weight) / (weeklyData.length - 1)
+        : 0;
+
+    // Calculate 'This Week' - Average change in weight over the last 7 days
+    const thisWeekChange = weeklyData.length > 1
+        ? (weeklyData[weeklyData.length - 1].weight - weeklyData[0].weight) / (weeklyData.length - 1)
+        : 0;
+
+    // Calculate 'This Month' - Average change in weight over the last 30 days
+    const monthlyData = data.slice(-30);
+    const thisMonthChange = monthlyData.length > 1
+        ? (monthlyData[monthlyData.length - 1].weight - monthlyData[0].weight) / (monthlyData.length - 1)
+        : 0;
+
+    // Calculate 'Total' - Difference between the initial and latest weight
+    const total = latestWeight - initialWeight;
+
+    return {
+        actual: actual.toFixed(2) + " kg",
+        change: (change >= 0 ? '▲' : '▼') + Math.abs(change).toFixed(2) + " kg",
+        trendWeek: (trendWeek >= 0 ? '▲' : '▼') + Math.abs(trendWeek).toFixed(2) + " kg",
+        thisWeek: (thisWeekChange >= 0 ? '▲' : '▼') + Math.abs(thisWeekChange).toFixed(2) + " kg",
+        thisMonth: (thisMonthChange >= 0 ? '▲' : '▼') + Math.abs(thisMonthChange).toFixed(2) + " kg",
+        total: (total >= 0 ? '▲' : '▼') + Math.abs(total).toFixed(2) + " kg"
+    };
+}
+
+
+
+// Function to fetch data from server
 async function fetchData() {
     const sheetId = '1xZoIrtg7Mb2XL-_s3eM8JptnTrg4Zc4N48KGhBG5k1g'; // Replace with your actual Google Sheet ID
     const apiKey = 'AIzaSyCqr7U6m8gIl8RAnAIPGXOC12uGMAxJ4ek'; // Replace with your actual Google Sheets API key
@@ -30,90 +77,69 @@ async function fetchData() {
     }
 }
 
-// Function to update the page with calculated metrics
+
+
+
+// Function to update the page with chart and metrics
 async function updatePage() {
     const data = await fetchData();
-    if (!data) {
-        console.error("Data is null or undefined. Can't update the page.");
-        return;
-    }
 
-    // Sort the data by date in ascending order to ensure the last entry is the latest
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (data) {
+        console.log('Data successfully fetched and passed to updatePage:', data);  // Debug message
 
-    // Get the latest (most recent) entry
-    const latestEntry = data[data.length - 1];
-    const actualWeight = latestEntry.weight;
+        // Render chart
+        const labels = data.map(entry => entry.date);
+        const weights = data.map(entry => entry.weight);
 
-    // Calculate other metrics
-    const secondLatestEntry = data[data.length - 2] || latestEntry; // Fallback to latest if only one entry
-    const change = actualWeight - secondLatestEntry.weight;
-    const totalChange = actualWeight - data[0].weight;
-
-    // Calculate weekly trend (average change per week over the last week if available)
-    const oneWeekAgoIndex = data.findIndex(entry => new Date(entry.date) >= new Date(new Date(latestEntry.date).setDate(new Date(latestEntry.date).getDate() - 7)));
-    const weeklyChange = oneWeekAgoIndex !== -1 ? actualWeight - data[oneWeekAgoIndex].weight : change;
-
-    // Calculate average change this week and this month
-    const oneWeekAgoData = data.slice(oneWeekAgoIndex);
-    const weeklyAverageChange = oneWeekAgoData.length > 1 ? (oneWeekAgoData[oneWeekAgoData.length - 1].weight - oneWeekAgoData[0].weight) / (oneWeekAgoData.length - 1) : change;
-
-    const oneMonthAgoIndex = data.findIndex(entry => new Date(entry.date) >= new Date(new Date(latestEntry.date).setMonth(new Date(latestEntry.date).getMonth() - 1)));
-    const oneMonthAgoData = data.slice(oneMonthAgoIndex);
-    const monthlyAverageChange = oneMonthAgoData.length > 1 ? (oneMonthAgoData[oneMonthAgoData.length - 1].weight - oneMonthAgoData[0].weight) / (oneMonthAgoData.length - 1) : change;
-
-    // Update HTML elements with calculated values
-    document.getElementById("actual-weight").textContent = `${actualWeight.toFixed(2)} kg`;
-    document.getElementById("change").textContent = `${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)} kg`;
-    document.getElementById("trend-weekly").textContent = `${weeklyChange >= 0 ? '▲' : '▼'} ${Math.abs(weeklyChange).toFixed(2)} kg`;
-    document.getElementById("this-week").textContent = `${weeklyAverageChange >= 0 ? '▲' : '▼'} ${Math.abs(weeklyAverageChange).toFixed(2)} kg`;
-    document.getElementById("this-month").textContent = `${monthlyAverageChange >= 0 ? '▲' : '▼'} ${Math.abs(monthlyAverageChange).toFixed(2)} kg`;
-    document.getElementById("total-change").textContent = `${totalChange >= 0 ? '▲' : '▼'} ${Math.abs(totalChange).toFixed(2)} kg`;
-
-    // Update the chart with the data
-    updateChart(data);
-}
-
-// Function to update the chart
-function updateChart(data) {
-    const ctx = document.getElementById('chart').getContext('2d');
-    const dates = data.map(entry => entry.date);
-    const weights = data.map(entry => entry.weight);
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: 'Weight',
-                data: weights,
-                borderColor: 'lime',
-                backgroundColor: 'lime',
-                fill: false,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    type: 'category',
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
+        const ctx = document.getElementById('chart').getContext('2d');
+        const weightChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Weight',
+                    data: weights,
+                    borderColor: '#00ff00',
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#00ff00'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
                 },
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Weight (kg)'
-                    }
+                scales: {
+                    y: {
+                        ticks: {
+                            color: '#fff',
+                            callback: function(value) { return value + ' kg'; } // Adds kg unit to y-axis
+                        }
+                    },
+                    x: { ticks: { color: '#fff' } }
+                },
+                layout: {
+                    padding: { left: 20, right: 20 }
                 }
             }
-        }
-    });
+        });
+
+        // Calculate and render metrics
+        const metrics = calculateMetrics(data);
+        document.getElementById('stats').innerHTML = `
+            <div>Actual<br><span>${metrics.actual}</span></div>
+            <div>Change<br><span>${metrics.change.startsWith('-') ? '▼' : '▲'}${metrics.change.replace('-', '')}</span></div>
+            <div>Trend (week)<br><span>${metrics.trendWeek.startsWith('-') ? '▼' : '▲'}${metrics.trendWeek.replace('-', '')}</span></div>
+            <div>This Week<br><span>${metrics.thisWeek.startsWith('-') ? '▼' : '▲'}${metrics.thisWeek.replace('-', '')}</span></div>
+            <div>This Month<br><span>${metrics.thisMonth.startsWith('-') ? '▼' : '▲'}${metrics.thisMonth.replace('-', '')}</span></div>
+            <div>Total<br><span>${metrics.total.startsWith('-') ? '▼' : '▲'}${metrics.total.replace('-', '')}</span></div>
+        `;
+    } else {
+        console.error("Data is null or undefined. Can't update the page.");
+    }
 }
 
-// Initialize the page with data
-document.addEventListener('DOMContentLoaded', updatePage);
+// Initial call to update the page
+updatePage();
