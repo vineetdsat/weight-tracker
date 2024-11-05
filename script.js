@@ -76,6 +76,7 @@ async function fetchData() {
 }
 
 
+
 // Function to update the page with chart and metrics
 async function updatePage() {
     const data = await fetchData();
