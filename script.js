@@ -6,8 +6,13 @@ function calculateMetrics(data) {
     const secondLatestWeight = data.length > 1 ? data[data.length - 2].weight : latestWeight;
     const initialWeight = data[0].weight;
 
+    // Calculate 'Actual' - Latest weight entered
     const actual = latestWeight;
+
+    // Calculate 'Change' - Difference between the latest weight and the second latest weight
     const change = latestWeight - secondLatestWeight;
+
+    // Calculate 'Total' - Difference between the initial and latest weight
     const total = latestWeight - initialWeight;
 
     // Arrow formatting
@@ -16,19 +21,13 @@ function calculateMetrics(data) {
     const totalArrow = total >= 0 ? '▲' : '▼';
     const totalColor = total >= 0 ? 'red' : 'green';
 
-    const trendWeek = calculateWeeklyTrend(data);
-    const thisWeekChange = calculateWeeklyChange(data);
-    const thisMonthChange = calculateMonthlyChange(data);
-
     return {
         actual: actual.toFixed(2) + " kg",
         change: `<span style="color: ${changeColor}">${changeArrow} ${Math.abs(change).toFixed(2)} kg</span>`,
-        trendWeek: (trendWeek >= 0 ? '▲' : '▼') + Math.abs(trendWeek).toFixed(2) + " kg",
-        thisWeek: (thisWeekChange >= 0 ? '▲' : '▼') + Math.abs(thisWeekChange).toFixed(2) + " kg",
-        thisMonth: (thisMonthChange >= 0 ? '▲' : '▼') + Math.abs(thisMonthChange).toFixed(2) + " kg",
         total: `<span style="color: ${totalColor}">${totalArrow} ${Math.abs(total).toFixed(2)} kg</span>`
     };
 }
+
 
 function calculateWeeklyTrend(data) {
     const weeklyData = data.slice(-7);
@@ -88,6 +87,12 @@ async function fetchData() {
 function renderChart(labels, weights) {
     const ctx = document.getElementById('chart').getContext('2d');
 
+    // Find the minimum and maximum weights and their indices
+    const minWeight = Math.min(...weights);
+    const maxWeight = Math.max(...weights);
+    const minIndex = weights.indexOf(minWeight);
+    const maxIndex = weights.indexOf(maxWeight);
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -110,9 +115,24 @@ function renderChart(labels, weights) {
                     callbacks: {
                         label: function(context) {
                             const weight = context.raw.toFixed(2) + ' kg';
-                            const date = context.label; // This is the date for the data point
+                            const date = context.label;
                             return `Date: ${date}, Weight: ${weight}`;
                         }
+                    }
+                },
+                datalabels: {
+                    display: function(context) {
+                        // Display labels only for the minimum and maximum points
+                        return context.dataIndex === minIndex || context.dataIndex === maxIndex;
+                    },
+                    align: 'top',
+                    anchor: 'end',
+                    formatter: function(value) {
+                        return value.toFixed(2) + ' kg';
+                    },
+                    color: '#00ff00',
+                    font: {
+                        weight: 'bold'
                     }
                 }
             },
@@ -133,7 +153,7 @@ function renderChart(labels, weights) {
                 padding: { left: 20, right: 20 }
             }
         },
-        plugins: [ChartDataLabels]
+        plugins: [ChartDataLabels] // Ensure the ChartDataLabels plugin is included
     });
 }
 
@@ -146,24 +166,24 @@ async function updatePage() {
     if (data) {
         console.log('Data successfully fetched and passed to updatePage:', data);
 
+        // Render chart
         const labels = data.map(entry => entry.date);
         const weights = data.map(entry => entry.weight);
 
         renderChart(labels, weights);
 
+        // Calculate and render metrics
         const metrics = calculateMetrics(data);
         document.getElementById('stats').innerHTML = `
             <div>Actual<br><span>${metrics.actual}</span></div>
             <div>Change<br><span>${metrics.change}</span></div>
-            <div>Trend (week)<br><span>${metrics.trendWeek.startsWith('-') ? '▼' : '▲'}${metrics.trendWeek.replace('-', '')}</span></div>
-            <div>This Week<br><span>${metrics.thisWeek.startsWith('-') ? '▼' : '▲'}${metrics.thisWeek.replace('-', '')}</span></div>
-            <div>This Month<br><span>${metrics.thisMonth.startsWith('-') ? '▼' : '▲'}${metrics.thisMonth.replace('-', '')}</span></div>
             <div>Total<br><span>${metrics.total}</span></div>
         `;
     } else {
         console.error("Data is null or undefined. Can't update the page.");
     }
 }
+
 
 
 // Initial call to update the page
