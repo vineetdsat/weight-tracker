@@ -97,7 +97,6 @@ function renderChart(labels, weights) {
                 borderWidth: 2,
                 pointRadius: 0, // Removes the dots at each data point
                 pointHoverRadius: 0, // Ensures no dots appear on hover
-                // Show data labels for min and max points only
                 datalabels: {
                     display: function(context) {
                         // Display only for min and max points
@@ -154,6 +153,7 @@ function renderChart(labels, weights) {
         plugins: [ChartDataLabels] // Ensure that the ChartDataLabels plugin is included
     });
 }
+
 
 
 // Function to update the page with chart and metrics
