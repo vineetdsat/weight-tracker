@@ -47,20 +47,31 @@ function calculateMetrics(data) {
 
 // Function to fetch data from server
 async function fetchData() {
+    const sheetId = '1xZoIrtg7Mb2XL-_s3eM8JptnTrg4Zc4N48KGhBG5k1g'; // Replace with your actual Google Sheet ID
+    const apiKey = '9d62627ff965e0c0e350eef61f0f8abeb929aab1'; // Replace with your actual Google Sheets API key
+    const range = 'Sheet1!A:B'; // Assumes your data is in the first sheet, columns A and B
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
     try {
-        const response = await fetch('/data');
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        let data = await response.json();
+        const data = await response.json();
 
-        // Filter out rows where weight is not a number (to skip headers or invalid rows)
-        data = data.filter(row => !isNaN(row.weight));
+        // Convert Google Sheets data format to our expected format
+        const rows = data.values;
+        const formattedData = rows.slice(1).map(row => ({
+            date: row[0],
+            weight: parseFloat(row[1])
+        }));
 
-        console.log('Filtered data:', data);  // Debug message to confirm filtering
-        return data;
+        console.log('Fetched data from Google Sheets:', formattedData); // Debug message
+        return formattedData;
     } catch (error) {
         console.error('Error fetching data:', error);
+        return null;
     }
 }
 
