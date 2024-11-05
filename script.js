@@ -48,7 +48,7 @@ function calculateMetrics(data) {
 // Function to fetch data from server
 async function fetchData() {
     const sheetId = '1xZoIrtg7Mb2XL-_s3eM8JptnTrg4Zc4N48KGhBG5k1g'; // Replace with your actual Google Sheet ID
-    const apiKey = '9d62627ff965e0c0e350eef61f0f8abeb929aab1'; // Replace with your actual Google Sheets API key
+    const apiKey = 'AIzaSyCqr7U6m8gIl8RAnAIPGXOC12uGMAxJ4ek'; // Replace with your actual Google Sheets API key
     const range = 'Sheet1!A:B'; // Assumes your data is in the first sheet, columns A and B
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
