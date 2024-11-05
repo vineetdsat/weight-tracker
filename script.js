@@ -143,3 +143,44 @@ async function updatePage() {
 
 // Initial call to update the page
 updatePage();
+
+function updateChart(data) {
+    const ctx = document.getElementById('chart').getContext('2d');
+    const weights = data.map(entry => entry.weight);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(entry => entry.date), // Dates are included but will be hidden on the x-axis
+            datasets: [{
+                label: 'Weight',
+                data: weights,
+                borderColor: 'lime',
+                backgroundColor: 'lime',
+                fill: false,
+                tension: 0.1,
+                pointRadius: 0 // Removes the dots at each data point
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: false // Hides the x-axis with dates
+                },
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Weight (kg)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Hides the legend if you don't want the "Weight" label
+                }
+            }
+        }
+    });
+}
