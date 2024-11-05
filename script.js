@@ -53,6 +53,8 @@ async function fetchData() {
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
+    console.log('Fetching data from:', url); // Debug log
+
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -67,13 +69,14 @@ async function fetchData() {
             weight: parseFloat(row[1])
         }));
 
-        console.log('Fetched data from Google Sheets:', formattedData); // Debug message
+        console.log('Fetched data from Google Sheets:', formattedData); // Debug log
         return formattedData;
     } catch (error) {
         console.error('Error fetching data:', error);
         return null;
     }
 }
+
 
 
 
