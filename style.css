@@ -1,3 +1,4 @@
+/* General Styling */
 body {
     display: flex;
     justify-content: center;
@@ -22,6 +23,7 @@ header {
     margin-bottom: 20px;
 }
 
+/* Stats Section Styling */
 .stats {
     display: flex;
     flex-wrap: wrap;
@@ -49,11 +51,12 @@ header {
     margin-top: 5px;
 }
 
+/* Chart Container Styling */
 .chart-container {
     width: 100%;
     background-color: #1e1e1e;
     border-radius: 8px;
-    padding: 20px;
+    padding: 10px;
     box-sizing: border-box;
     margin-top: 20px;
 }
@@ -63,15 +66,21 @@ canvas {
     max-height: 400px; /* Limit the height on smaller screens */
 }
 
-/* Responsive adjustments */
+/* Responsive Styling */
 @media (max-width: 768px) {
     header {
         font-size: 1.5em;
     }
 
+    .stats {
+        flex-direction: column; /* Stack stats boxes vertically on mobile */
+        align-items: center;
+    }
+
     .stats div {
         padding: 10px;
-        max-width: 100%; /* Expand metrics div to full width on smaller screens */
+        width: 100%; /* Make stats boxes full-width on mobile */
+        max-width: 100%;
     }
 
     .chart-container {
@@ -80,5 +89,19 @@ canvas {
 
     canvas {
         max-height: 300px; /* Reduce chart height further for small screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .stats div {
+        font-size: 0.9em;
+    }
+
+    header {
+        font-size: 1.2em;
+    }
+
+    .stats span {
+        font-size: 1em;
     }
 }
