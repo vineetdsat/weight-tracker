@@ -1,4 +1,3 @@
-/* General Styling */
 body {
     display: flex;
     justify-content: center;
@@ -12,9 +11,9 @@ body {
 
 .container {
     width: 90%;
-    max-width: 1000px;
-    text-align: center;
+    max-width: 1200px;
     padding: 20px;
+    text-align: center;
     box-sizing: border-box;
 }
 
@@ -23,7 +22,6 @@ header {
     margin-bottom: 20px;
 }
 
-/* Stats Section Styling */
 .stats {
     display: flex;
     flex-wrap: wrap;
@@ -44,64 +42,32 @@ header {
     text-align: center;
 }
 
-.stats span {
-    font-size: 1.2em;
-    font-weight: bold;
-    display: block;
-    margin-top: 5px;
-}
-
-/* Chart Container Styling */
 .chart-container {
     width: 100%;
     background-color: #1e1e1e;
     border-radius: 8px;
-    padding: 10px;
+    padding: 30px;
     box-sizing: border-box;
     margin-top: 20px;
 }
 
 canvas {
-    width: 100%; /* Ensures the chart fills the container */
-    max-height: 400px; /* Limit the height on smaller screens */
+    width: 100%;
+    height: 500px;
+    max-height: 600px;
 }
 
-/* Responsive Styling */
-@media (max-width: 768px) {
-    header {
-        font-size: 1.5em;
+/* Adjust layout for larger screens */
+@media (min-width: 1200px) {
+    .container {
+        padding: 40px;
+        max-width: 1400px;
     }
-
-    .stats {
-        flex-direction: column; /* Stack stats boxes vertically on mobile */
-        align-items: center;
-    }
-
     .stats div {
-        padding: 10px;
-        width: 100%; /* Make stats boxes full-width on mobile */
-        max-width: 100%;
+        max-width: 220px;
+        font-size: 1.1em;
     }
-
     .chart-container {
-        padding: 5px;
-    }
-
-    canvas {
-        max-height: 300px; /* Reduce chart height further for small screens */
-    }
-}
-
-@media (max-width: 480px) {
-    .stats div {
-        font-size: 0.9em;
-    }
-
-    header {
-        font-size: 1.2em;
-    }
-
-    .stats span {
-        font-size: 1em;
+        padding: 40px;
     }
 }
