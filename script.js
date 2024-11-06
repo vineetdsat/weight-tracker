@@ -17,8 +17,8 @@ function calculateMetrics(data) {
 
     // Calculate '%Consistency' - Total Number of Rows / Date Difference (in days) between First and Last Entry
     const totalRows = data.length;
-    const startDate = new Date(data[0].date);
-    const endDate = new Date(data[data.length - 1].date);
+    const startDate = new Date(data[data.length - 1].date); 
+    const endDate = new Date(data[0].date);
     const dateDifference = Math.max((endDate - startDate) / (1000 * 60 * 60 * 24), 1); // Avoid divide by zero
     const consistency = ((totalRows / dateDifference) * 100).toFixed(2) + '%';
 
@@ -28,11 +28,15 @@ function calculateMetrics(data) {
     const totalArrow = total >= 0 ? '▲' : '▼';
     const totalColor = total >= 0 ? 'red' : 'green';
 
+    // Fixed target value
+    const target = "73 kg";
+
     return {
         actual: actual.toFixed(2) + " kg",
         change: `<span style="color: ${changeColor}">${changeArrow} ${Math.abs(change).toFixed(2)} kg</span>`,
         total: `<span style="color: ${totalColor}">${totalArrow} ${Math.abs(total).toFixed(2)} kg</span>`,
-        consistency: consistency
+        consistency: consistency,
+        target: target
     };
 }
 
