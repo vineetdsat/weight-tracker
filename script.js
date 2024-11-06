@@ -15,12 +15,12 @@ function calculateMetrics(data) {
     // Calculate 'Total' - Difference between the initial and latest weight
     const total = latestWeight - initialWeight;
 
-    // Calculate '%Consistency' - Total Number of Rows / Date Difference (in days) between First and Last Entry
-    const totalRows = data.length;
-    const startDate = new Date(data[data.length - 1].date); 
-    const endDate = new Date(data[0].date);
-    const dateDifference = Math.max((endDate - startDate) / (1000 * 60 * 60 * 24), 1); // Avoid divide by zero
-    const consistency = ((totalRows / dateDifference) * 100).toFixed(2) + '%';
+    // Calculate '%Consistency'
+    const totalRows = data.length; // Total number of entries
+    const oldestDate = new Date(data[0].date); // First entry date (oldest)
+    const latestDate = new Date(data[data.length - 1].date); // Last entry date (latest)
+    const totalDays = Math.max((latestDate - oldestDate) / (1000 * 60 * 60 * 24), 1); // Difference in days
+    const consistency = ((totalRows / totalDays) * 100).toFixed(2) + '%';
 
     // Arrow formatting
     const changeArrow = change >= 0 ? '▲' : '▼';
@@ -36,9 +36,15 @@ function calculateMetrics(data) {
         change: `<span style="color: ${changeColor}">${changeArrow} ${Math.abs(change).toFixed(2)} kg</span>`,
         total: `<span style="color: ${totalColor}">${totalArrow} ${Math.abs(total).toFixed(2)} kg</span>`,
         consistency: consistency,
+        totalRows: totalRows,
+        oldestDate: oldestDate,
+        latestDate: latestDate,
+        totalDays: totalDays,
         target: target
     };
 }
+
+
 
 
 
@@ -192,6 +198,10 @@ async function updatePage() {
             <div>Change<br><span>${metrics.change}</span></div>
             <div>Total<br><span>${metrics.total}</span></div>
             <div>%Consistency<br><span>${metrics.consistency}</span></div>
+            <div>%totalRows<br><span>${metrics.totalRows}</span></div>
+            <div>%oldestDate<br><span>${metrics.oldestDate}</span></div>
+            <div>%latestDate<br><span>${metrics.latestDate}</span></div>
+            <div>%totalDays<br><span>${metrics.totalDays}</span></div>
             <div>Target<br><span>${metrics.target}</span></div>
         `;
     } else {
