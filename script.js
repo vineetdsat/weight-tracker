@@ -192,11 +192,13 @@ async function updatePage() {
             <div>Change<br><span>${metrics.change}</span></div>
             <div>Total<br><span>${metrics.total}</span></div>
             <div>%Consistency<br><span>${metrics.consistency}</span></div>
+            <div>Target<br><span>${metrics.target}</span></div>
         `;
     } else {
         console.error("Data is null or undefined. Can't update the page.");
     }
 }
+
 
 
 
