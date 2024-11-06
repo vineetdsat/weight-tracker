@@ -36,10 +36,6 @@ function calculateMetrics(data) {
         change: `<span style="color: ${changeColor}">${changeArrow} ${Math.abs(change).toFixed(2)} kg</span>`,
         total: `<span style="color: ${totalColor}">${totalArrow} ${Math.abs(total).toFixed(2)} kg</span>`,
         consistency: consistency,
-        totalRows: totalRows,
-        oldestDate: oldestDate,
-        latestDate: latestDate,
-        totalDays: totalDays,
         target: target
     };
 }
@@ -198,10 +194,6 @@ async function updatePage() {
             <div>Change<br><span>${metrics.change}</span></div>
             <div>Total<br><span>${metrics.total}</span></div>
             <div>%Consistency<br><span>${metrics.consistency}</span></div>
-            <div>%totalRows<br><span>${metrics.totalRows}</span></div>
-            <div>%oldestDate<br><span>${metrics.oldestDate}</span></div>
-            <div>%latestDate<br><span>${metrics.latestDate}</span></div>
-            <div>%totalDays<br><span>${metrics.totalDays}</span></div>
             <div>Target<br><span>${metrics.target}</span></div>
         `;
     } else {
