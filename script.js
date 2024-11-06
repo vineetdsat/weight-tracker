@@ -15,6 +15,13 @@ function calculateMetrics(data) {
     // Calculate 'Total' - Difference between the initial and latest weight
     const total = latestWeight - initialWeight;
 
+    // Calculate '%Consistency' - Total Number of Rows / Date Difference (in days) between First and Last Entry
+    const totalRows = data.length;
+    const startDate = new Date(data[0].date);
+    const endDate = new Date(data[data.length - 1].date);
+    const dateDifference = Math.max((endDate - startDate) / (1000 * 60 * 60 * 24), 1); // Avoid divide by zero
+    const consistency = ((totalRows / dateDifference) * 100).toFixed(2) + '%';
+
     // Arrow formatting
     const changeArrow = change >= 0 ? '▲' : '▼';
     const changeColor = change >= 0 ? 'red' : 'green';
@@ -24,9 +31,11 @@ function calculateMetrics(data) {
     return {
         actual: actual.toFixed(2) + " kg",
         change: `<span style="color: ${changeColor}">${changeArrow} ${Math.abs(change).toFixed(2)} kg</span>`,
-        total: `<span style="color: ${totalColor}">${totalArrow} ${Math.abs(total).toFixed(2)} kg</span>`
+        total: `<span style="color: ${totalColor}">${totalArrow} ${Math.abs(total).toFixed(2)} kg</span>`,
+        consistency: consistency
     };
 }
+
 
 
 function calculateWeeklyTrend(data) {
@@ -178,11 +187,13 @@ async function updatePage() {
             <div>Actual<br><span>${metrics.actual}</span></div>
             <div>Change<br><span>${metrics.change}</span></div>
             <div>Total<br><span>${metrics.total}</span></div>
+            <div>%Consistency<br><span>${metrics.consistency}</span></div>
         `;
     } else {
         console.error("Data is null or undefined. Can't update the page.");
     }
 }
+
 
 
 
